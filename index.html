@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aery — AI Coding Agent for the Terminal</title>
+  <meta name="description" content="Aery is an open-source AI coding agent for the terminal. Multi-agent, extensible, and built for real work." />
+  <meta property="og:title" content="Aery — AI Coding Agent for the Terminal" />
+  <meta property="og:description" content="Open-source AI coding agent. Multi-agent, extensible, built for real work." />
+  <meta property="og:image" content="https://eminent337.github.io/og.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #7eb8d4;
+      --accent-dim: #4a8aaa;
+      --accent-glow: rgba(126, 184, 212, 0.15);
+      --bg: #0a0e12;
+      --bg2: #0f1419;
+      --bg3: #141c24;
+      --border: rgba(126, 184, 212, 0.12);
+      --border-hover: rgba(126, 184, 212, 0.3);
+      --text: #e2e8f0;
+      --text-dim: #8899aa;
+      --text-muted: #4a5568;
+      --radius: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Geist', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 56px;
+      background: rgba(10, 14, 18, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Geist Mono', monospace;
+      font-size: 1rem; font-weight: 600;
+      color: var(--accent); letter-spacing: 0.05em;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a {
+      color: var(--text-dim); text-decoration: none;
+      font-size: 0.875rem; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #0a0e12 !important;
+      padding: 0.4rem 1rem; border-radius: var(--radius);
+      font-weight: 500; font-size: 0.8rem !important;
+      transition: opacity 0.2s !important;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(126,184,212,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 100px; padding: 0.3rem 0.9rem;
+      font-size: 0.75rem; color: var(--accent);
+      font-family: 'Geist Mono', monospace;
+      margin-bottom: 2rem;
+    }
+    .hero-badge span { color: var(--text-dim); }
+    .hero-ascii {
+      font-family: 'Geist Mono', monospace;
+      font-size: clamp(0.45rem, 1.2vw, 0.75rem);
+      line-height: 1.2;
+      color: var(--accent);
+      margin-bottom: 2.5rem;
+      white-space: pre;
+      text-shadow: 0 0 30px rgba(126,184,212,0.4);
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300; letter-spacing: -0.02em;
+      line-height: 1.15; margin-bottom: 1.25rem;
+      max-width: 700px;
+    }
+    h1 strong { font-weight: 600; color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-dim); max-width: 520px;
+      margin-bottom: 2.5rem; font-weight: 300;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      background: var(--accent); color: #0a0e12;
+      padding: 0.75rem 1.75rem; border-radius: var(--radius);
+      font-weight: 600; font-size: 0.95rem;
+      text-decoration: none; transition: all 0.2s;
+      box-shadow: 0 0 24px rgba(126,184,212,0.25);
+    }
+    .btn-primary:hover { opacity: 0.9; box-shadow: 0 0 36px rgba(126,184,212,0.4); transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      padding: 0.75rem 1.75rem; border-radius: var(--radius);
+      font-weight: 500; font-size: 0.95rem;
+      text-decoration: none; border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--border-hover); background: var(--accent-glow); }
+
+    /* ── INSTALL STRIP ── */
+    .install-strip {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.75rem; margin-top: 3rem;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.875rem;
+    }
+    .install-cmd {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.6rem 1.2rem;
+      color: var(--accent); cursor: pointer;
+      transition: border-color 0.2s;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .install-cmd:hover { border-color: var(--border-hover); }
+    .install-cmd .prompt { color: var(--text-muted); }
+    .copy-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 0.8rem;
+      padding: 0; transition: color 0.2s;
+    }
+    .copy-btn:hover { color: var(--accent); }
+
+    /* ── TERMINAL DEMO ── */
+    .terminal-wrap {
+      width: 100%; max-width: 780px;
+      margin: 4rem auto 0;
+      border-radius: 12px; overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(126,184,212,0.05);
+    }
+    .terminal-bar {
+      background: var(--bg3); padding: 0.75rem 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .terminal-title {
+      flex: 1; text-align: center;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+    .terminal-body {
+      background: #0d1117; padding: 1.5rem;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.8rem; line-height: 1.7;
+      min-height: 320px;
+    }
+    .t-dim { color: var(--text-muted); }
+    .t-accent { color: var(--accent); }
+    .t-green { color: #4ade80; }
+    .t-yellow { color: #fbbf24; }
+    .t-white { color: var(--text); }
+    .t-prompt { color: #4a5568; }
+    .cursor {
+      display: inline-block; width: 8px; height: 14px;
+      background: var(--accent); vertical-align: middle;
+      animation: blink 1.2s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── SECTION ── */
+    section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em;
+      color: var(--accent); text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+      font-weight: 300; letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-title strong { font-weight: 600; }
+    .section-sub { color: var(--text-dim); max-width: 520px; font-size: 1.05rem; }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px; margin-top: 4rem;
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden;
+    }
+    .feature {
+      background: var(--bg2); padding: 2rem;
+      transition: background 0.2s;
+    }
+    .feature:hover { background: var(--bg3); }
+    .feature-icon {
+      font-size: 1.5rem; margin-bottom: 1rem;
+      display: block;
+    }
+    .feature h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .feature p { font-size: 0.875rem; color: var(--text-dim); line-height: 1.6; }
+
+    /* ── MARKETPLACE ── */
+    .packs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .pack-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem;
+      transition: all 0.2s;
+    }
+    .pack-card:hover { border-color: var(--border-hover); background: var(--bg3); transform: translateY(-2px); }
+    .pack-name {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.8rem; color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    .pack-tag {
+      display: inline-block; font-size: 0.65rem;
+      background: var(--accent-glow); color: var(--accent);
+      border-radius: 4px; padding: 0.1rem 0.4rem;
+      margin-bottom: 0.6rem; font-family: 'Geist Mono', monospace;
+    }
+    .pack-desc { font-size: 0.8rem; color: var(--text-dim); }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex; gap: 3rem; flex-wrap: wrap;
+      margin-top: 4rem; padding-top: 4rem;
+      border-top: 1px solid var(--border);
+    }
+    .stat-num {
+      font-size: 2.5rem; font-weight: 600;
+      color: var(--accent); font-family: 'Geist Mono', monospace;
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.875rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      text-align: center; padding: 6rem 2rem;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(126,184,212,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-size: clamp(1.75rem, 4vw, 3rem);
+      font-weight: 300; letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .cta-section p { color: var(--text-dim); margin-bottom: 2.5rem; font-size: 1.05rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem; text-align: center;
+      font-size: 0.8rem; color: var(--text-muted);
+      font-family: 'Geist Mono', monospace;
+    }
+    footer a { color: var(--text-dim); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    /* ── DIVIDER ── */
+    .full-divider { border: none; border-top: 1px solid var(--border); }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links { gap: 1rem; }
+      .hero { padding: 5rem 1.25rem 3rem; }
+      section { padding: 4rem 1.25rem; }
+      .stats-row { gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">⌬ aery</a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#marketplace">Marketplace</a>
+    <a href="https://github.com/eminent337/aery" target="_blank">GitHub</a>
+    <a href="https://github.com/eminent337/aery#readme" class="nav-cta">Get Started →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span>⌬</span> v0.1.28 · MIT License <span>·</span> Open Source
+  </div>
+
+  <pre class="hero-ascii"> █████╗ ███████╗██████╗ ██╗   ██╗
+██╔══██╗██╔════╝██╔══██╗╚██╗ ██╔╝
+███████║█████╗  ██████╔╝ ╚████╔╝ 
+██╔══██║██╔══╝  ██╔══██╗  ╚██╔╝  
+██║  ██║███████╗██║  ██║   ██║   
+╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝  </pre>
+
+  <h1>The AI coding agent<br /><strong>built for real work</strong></h1>
+  <p class="hero-sub">Multi-agent, extensible, and runs entirely in your terminal. No browser. No subscription. Just code.</p>
+
+  <div class="hero-actions">
+    <a href="#install" class="btn-primary">Install now</a>
+    <a href="https://github.com/eminent337/aery" target="_blank" class="btn-secondary">View on GitHub →</a>
+  </div>
+
+  <div class="install-strip" id="install">
+    <div class="install-cmd" onclick="copyInstall(this)">
+      <span class="prompt">$</span>
+      <span>npm install -g @eminent337/aery</span>
+      <button class="copy-btn" title="Copy">⎘</button>
+    </div>
+  </div>
+
+  <!-- Terminal demo -->
+  <div class="terminal-wrap">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <div class="terminal-title">⌬ aery — ~/my-project</div>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-accent"> █████╗ ███████╗██████╗ ██╗   ██╗</span></div>
+      <div><span class="t-accent">██╔══██╗██╔════╝██╔══██╗╚██╗ ██╔╝</span></div>
+      <div><span class="t-accent">███████║█████╗  ██████╔╝ ╚████╔╝ </span></div>
+      <div><span class="t-accent">██╔══██║██╔══╝  ██╔══██╗  ╚██╔╝  </span></div>
+      <div><span class="t-accent">██║  ██║███████╗██║  ██║   ██║   </span></div>
+      <div><span class="t-accent">╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝  </span></div>
+      <div><span class="t-dim">  AI coding agent · v0.1.28</span></div>
+      <div><span class="t-dim">  escape interrupt · ctrl+c clear/exit · / commands</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-dim">────────────────────────────────────────────────</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-white">refactor the auth module to use JWT and add refresh token support</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-green">✓</span> <span class="t-dim">Reading</span> <span class="t-white">src/auth/auth.service.ts</span></div>
+      <div><span class="t-green">✓</span> <span class="t-dim">Reading</span> <span class="t-white">src/auth/auth.module.ts</span></div>
+      <div><span class="t-green">✓</span> <span class="t-dim">Writing</span> <span class="t-white">src/auth/jwt.strategy.ts</span></div>
+      <div><span class="t-green">✓</span> <span class="t-dim">Writing</span> <span class="t-white">src/auth/refresh-token.service.ts</span></div>
+      <div><span class="t-green">✓</span> <span class="t-dim">Editing</span> <span class="t-white">src/auth/auth.service.ts</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-accent">Done.</span> <span class="t-dim">JWT auth with refresh tokens implemented. 3 files changed.</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-dim">────────────────────────────────────────────────</span></div>
+      <div><span class="t-dim">~/my-project · gpt-4o · $0.003 · 2.1k tokens</span></div>
+      <div>&nbsp;</div>
+      <div><span class="t-prompt">›</span> <span class="cursor"></span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="full-divider" />
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Why Aery</div>
+  <h2 class="section-title">Everything you need.<br /><strong>Nothing you don't.</strong></h2>
+  <p class="section-sub">Built on pi-mono's battle-tested core, extended with 16 production-ready extensions out of the box.</p>
+
+  <div class="features-grid">
+    <div class="feature">
+      <span class="feature-icon">⚡</span>
+      <h3>Multi-agent by default</h3>
+      <p>Spawn parallel agents, chain them sequentially, or coordinate teams. Agent orchestration is a core extension, not an afterthought.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🔌</span>
+      <h3>Extension marketplace</h3>
+      <p>Browse and install packs with <code>/marketplace</code>. Core extensions auto-install on first run. Full pack, geospatial, data science — all one command.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🛡️</span>
+      <h3>Damage control built in</h3>
+      <p>Circuit breaker stops infinite loops. Damage control blocks dangerous commands. Auto-compact prevents context overflow. Safe by default.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🔀</span>
+      <h3>Smart model routing</h3>
+      <p>Auto-router picks the best model for each task. Model failover handles rate limits automatically. Provider profiles let you switch contexts instantly.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🌐</span>
+      <h3>Web-aware</h3>
+      <p>Web search and web fetch built into core. The agent can search DuckDuckGo, Tavily, or Exa, and read any URL — no plugins needed.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🔄</span>
+      <h3>Weekly upstream sync</h3>
+      <p>Automatically pulls improvements from pi-mono every Monday. Remaps package names, builds, and publishes — you get upstream fixes without lifting a finger.</p>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div>
+      <div class="stat-num">16</div>
+      <div class="stat-label">Core extensions, auto-installed</div>
+    </div>
+    <div>
+      <div class="stat-num">27+</div>
+      <div class="stat-label">Total extensions available</div>
+    </div>
+    <div>
+      <div class="stat-num">MIT</div>
+      <div class="stat-label">License — free forever</div>
+    </div>
+    <div>
+      <div class="stat-num">0</div>
+      <div class="stat-label">Config needed to start</div>
+    </div>
+  </div>
+</section>
+
+<hr class="full-divider" />
+
+<!-- MARKETPLACE -->
+<section id="marketplace">
+  <div class="section-label">Extension Marketplace</div>
+  <h2 class="section-title">One command.<br /><strong>Any capability.</strong></h2>
+  <p class="section-sub">Type <code style="color:var(--accent)">/marketplace</code> inside aery to browse and install packs from the community.</p>
+
+  <div class="packs-grid">
+    <div class="pack-card">
+      <div class="pack-name">core</div>
+      <div class="pack-tag">auto-installed</div>
+      <div class="pack-desc">13 essential extensions including web search, damage control, multi-agent, and auto-router.</div>
+    </div>
+    <div class="pack-card">
+      <div class="pack-name">full</div>
+      <div class="pack-tag">extension</div>
+      <div class="pack-desc">All 27 extensions — loop scheduler, session timeline, checkpoints, operational learning, and more.</div>
+    </div>
+    <div class="pack-card">
+      <div class="pack-name">pi-skills</div>
+      <div class="pack-tag">skills</div>
+      <div class="pack-desc">Brave search, browser automation, Gmail, Google Calendar, Drive, transcription, VS Code integration.</div>
+    </div>
+    <div class="pack-card">
+      <div class="pack-name">interactive-shell</div>
+      <div class="pack-tag">extension</div>
+      <div class="pack-desc">Full PTY shell overlay. Lets Aery control interactive CLIs like vim or Python REPL autonomously.</div>
+    </div>
+    <div class="pack-card">
+      <div class="pack-name">memory</div>
+      <div class="pack-tag">extension</div>
+      <div class="pack-desc">Plain-Markdown persistent memory system. Notes survive across sessions.</div>
+    </div>
+    <div class="pack-card">
+      <div class="pack-name">geospatial</div>
+      <div class="pack-tag">coming soon</div>
+      <div class="pack-desc">GDAL, coordinate systems, GIS workflows. Built for geospatial engineers.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="full-divider" />
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Start in <strong>30 seconds</strong></h2>
+  <p>One install. No config. Works with OpenAI, Anthropic, Gemini, OpenRouter, and more.</p>
+  <div class="install-strip">
+    <div class="install-cmd" onclick="copyInstall(this)">
+      <span class="prompt">$</span>
+      <span>npm install -g @eminent337/aery</span>
+      <button class="copy-btn" title="Copy">⎘</button>
+    </div>
+  </div>
+  <br /><br />
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+    <a href="https://github.com/eminent337/aery" target="_blank" class="btn-secondary">GitHub →</a>
+    <a href="https://github.com/eminent337/aery-extensions" target="_blank" class="btn-secondary">Extensions →</a>
+    <a href="https://github.com/eminent337/aery/blob/main/packages/coding-agent/docs/extensions.md" target="_blank" class="btn-secondary">Docs →</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    Built on <a href="https://github.com/badlogic/pi-mono" target="_blank">pi-mono</a> (MIT) ·
+    <a href="https://github.com/eminent337/aery" target="_blank">GitHub</a> ·
+    <a href="https://github.com/eminent337/aery-extensions" target="_blank">Extensions</a> ·
+    MIT License
+  </p>
+</footer>
+
+<script>
+  function copyInstall(el) {
+    navigator.clipboard.writeText('npm install -g @eminent337/aery').then(() => {
+      const btn = el.querySelector('.copy-btn');
+      btn.textContent = '✓';
+      setTimeout(() => btn.textContent = '⎘', 1500);
+    });
+  }
+</script>
+</body>
+</html>
