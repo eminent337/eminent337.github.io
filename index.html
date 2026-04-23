@@ -342,7 +342,7 @@
   <p class="hero-sub">Multi-agent, extensible, and runs entirely in your terminal. No browser. No subscription. Just code.</p>
 
   <div class="hero-actions">
-    <a href="#install" class="btn-primary">Install now</a>
+    <a href="#install" class="btn-primary" onclick="highlightInstall()">Install now</a>
     <a href="https://github.com/eminent337/aery" target="_blank" class="btn-secondary">View on GitHub →</a>
   </div>
 
@@ -527,6 +527,20 @@
 </footer>
 
 <script>
+  function highlightInstall() {
+    const el = document.querySelector('.install-cmd');
+    if (!el) return;
+    el.style.transition = 'all 0.2s';
+    el.style.borderColor = 'var(--accent)';
+    el.style.boxShadow = '0 0 24px rgba(126,184,212,0.5)';
+    el.style.transform = 'scale(1.02)';
+    setTimeout(() => {
+      el.style.borderColor = '';
+      el.style.boxShadow = '';
+      el.style.transform = '';
+    }, 1800);
+  }
+
   function copyInstall(el) {
     navigator.clipboard.writeText('npm install -g @eminent337/aery').then(() => {
       const btn = el.querySelector('.copy-btn');
