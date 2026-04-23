@@ -328,7 +328,7 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-badge">
-    <span>⌬</span> v0.1.28 · MIT License <span>·</span> Open Source
+    <span>⌬</span> <span id="ver">v0.1.29</span> · MIT License <span>·</span> Open Source
   </div>
 
   <pre class="hero-ascii"> █████╗ ███████╗██████╗ ██╗   ██╗
@@ -369,7 +369,7 @@
       <div><span class="t-accent">██╔══██║██╔══╝  ██╔══██╗  ╚██╔╝  </span></div>
       <div><span class="t-accent">██║  ██║███████╗██║  ██║   ██║   </span></div>
       <div><span class="t-accent">╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝  </span></div>
-      <div><span class="t-dim">  AI coding agent · v0.1.28</span></div>
+      <div><span class="t-dim">  AI coding agent · <span id="ver2">v0.1.29</span></span></div>
       <div><span class="t-dim">  escape interrupt · ctrl+c clear/exit · / commands</span></div>
       <div>&nbsp;</div>
       <div><span class="t-dim">────────────────────────────────────────────────</span></div>
@@ -534,6 +534,16 @@
       setTimeout(() => btn.textContent = '⎘', 1500);
     });
   }
+</script>
+
+<script>
+  fetch('https://registry.npmjs.org/@eminent337/aery/latest')
+    .then(r => r.json())
+    .then(d => {
+      const v = 'v' + d.version;
+      document.querySelectorAll('#ver, #ver2').forEach(el => el.textContent = v);
+    })
+    .catch(() => {});
 </script>
 </body>
 </html>
